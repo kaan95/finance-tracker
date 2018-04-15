@@ -1,22 +1,16 @@
 class StocksController < ApplicationController
   
   def search
-    if params[:stock].present?
-      # store the looked up stock (from user) in @stock
-      @stock = Stock.new_from_lookup(params[:stock])
-      # if stock symbol was correct, render this
-      if @stock
-        render 'users/my_portfolio'
-      # if @stock is nil (happens if user mistypes a symbol)   
-      else
-        flash[:danger] = "You have entered an incorrect stock ticker"
-        redirect_to my_portfolio_path
-      end
-      # if user doesnt enter anything
+    # if user doesnt enter anything
+    if params[:stock].blank?
+      flash.now[:danger] = "You did not enter anything... "
     else
-      flash[:danger] = "You did not enter anything... "
-      redirect_to my_portfolio_path
+      # if stock is present, store in @stock
+      @stock = Stock.new_from_lookup(params[:stock])
+      # give error message if stock is null unless stock is valid, then proceed to the render part
+      flash.now[:danger] = "You have entered an incorrect stock ticker" unless @stock
     end
+    render partial: 'users/result'
   end
   
 end
